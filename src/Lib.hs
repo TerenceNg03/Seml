@@ -1,9 +1,9 @@
 module Lib (
     module Seml,
     module Parser,
-    module Syntax
+    module Syntax,
 ) where
 
-import Seml
 import Parser
+import Seml
 import Syntax

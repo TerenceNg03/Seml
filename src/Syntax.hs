@@ -1,11 +1,12 @@
-module Syntax (semlP, wordsP, quotedP) where
+module Syntax (semlP) where
 
+import Control.Applicative (Applicative (liftA2))
 import Data.Char (isSpace)
-import Parser (Parser, betweenP, parser, repeatP, sepByP, (<|>))
+import Parser (Parser (Parser), betweenP, repeatP, sepByP, (<|>))
 import Seml (Element (Rec, Text), Seml (Elem, Tag))
 
 charP :: (Char -> Bool) -> Parser Char
-charP f = parser $ \s ->
+charP f = Parser $ \s ->
     case s of
         (x : xs)
             | f x -> (xs, Right x)
@@ -20,7 +21,9 @@ spaceP = repeatP (charP isSpace)
 
 -- | Parse word with escaped white space
 wordP :: Parser String
-wordP = repeatP (escapeSP <|> charP (not . \x -> isSpace x || x == ')' || x == '('))
+wordP =
+    let wcP = escapeSP <|> charP (not . \x -> isSpace x || x == ')' || x == '(')
+     in liftA2 (:) wcP (repeatP wcP)
 
 isP :: Char -> Parser Char
 isP c = charP (== c)
@@ -33,26 +36,25 @@ quotedP =
         doubleP = betweenP (isP '"') (isP '"') dsP
      in singleP <|> doubleP
 
--- | Parse words separated by white space
-wordsP :: Parser [String]
-wordsP = sepByP spaceP wordP
+semlOneP :: Parser Seml
+semlOneP =
+    let tagP' = Tag <$> tagP
+        elemsP' = liftA2 Elem (tagP <* spaceP) elemsP
+        betweenPP = betweenP (isP '(' <* spaceP) (spaceP *> isP ')')
+     in betweenPP tagP' <|> betweenPP elemsP'
 
-semlP :: Parser Seml
-semlP = tagP <|> elemsP
+semlP :: Parser [Seml]
+semlP = repeatP $ spaceP *> semlOneP <* spaceP
 
-tagP :: Parser Seml
-tagP =
-    let tag = isP '(' *> spaceP *> (wordP <|> quotedP) <* spaceP <* isP ')'
-     in Tag <$> tag
+tagP :: Parser String
+tagP = quotedP <|> wordP
 
 elemP :: Parser Element
-elemP = let elemWordP = Text <$> wordP
-            elemStringP = Text <$> quotedP
-            elemRecP = Rec <$> semlP
-        in elemWordP <|> elemStringP <|> elemRecP
+elemP =
+    let elemWordP = Text <$> wordP
+        elemStringP = Text <$> quotedP
+        elemRecP = Rec <$> semlOneP
+     in elemWordP <|> elemStringP <|> elemRecP
 
-elemsP :: Parser Seml
-elemsP = do
-    tag <- isP '(' *> spaceP *> (wordP <|> quotedP) <* spaceP
-    elem <- repeatP (elemP <* spaceP) <* isP ')'
-    return (Elem tag elem)
+elemsP :: Parser [Element]
+elemsP = sepByP spaceP elemP
