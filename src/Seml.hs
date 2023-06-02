@@ -23,7 +23,7 @@ extractAttr (x : xs) =
 
 toElem :: Element -> XML.Element
 toElem (Text s) = node (unqual s) ()
-toElem (Rec (Elem tag [Text text])) = node (unqual tag) ([]::[Attr], text)
+toElem (Rec (Elem tag [Text text])) = node (unqual tag) ([] :: [Attr], text)
 toElem (Rec s) = toXML s
 
 toXML :: Seml -> XML.Element
