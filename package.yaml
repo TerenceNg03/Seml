@@ -25,6 +25,9 @@ dependencies:
 - transformers
 - HUnit
 - pretty-simple
+- containers
+- text
+- xml
 
 ghc-options:
 - -Wall

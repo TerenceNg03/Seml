@@ -57,7 +57,7 @@ elemP =
     let elemWordP = Text <$> wordP
         elemStringP = Text <$> quotedP
         elemRecP = Rec <$> semlOneP
-     in elemWordP <|> elemStringP <|> elemRecP
+     in elemStringP <|> elemWordP <|> elemRecP
 
 elemsP :: Parser [Element]
 elemsP = sepByP spaceP elemP

@@ -37,9 +37,12 @@ library
   build-depends:
       HUnit
     , base >=4.7 && <5
+    , containers
     , mtl
     , pretty-simple
+    , text
     , transformers
+    , xml
   default-language: Haskell2010
 
 executable Seml-exe
@@ -53,9 +56,12 @@ executable Seml-exe
       HUnit
     , Seml
     , base >=4.7 && <5
+    , containers
     , mtl
     , pretty-simple
+    , text
     , transformers
+    , xml
   default-language: Haskell2010
 
 test-suite Seml-test
@@ -70,7 +76,10 @@ test-suite Seml-test
       HUnit
     , Seml
     , base >=4.7 && <5
+    , containers
     , mtl
     , pretty-simple
+    , text
     , transformers
+    , xml
   default-language: Haskell2010
