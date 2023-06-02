@@ -16,6 +16,7 @@ charP f = Parser $ \s ->
 escapeSP :: Parser Char
 escapeSP = isP '\\' *> charP (const True)
 
+-- | Parse white spaces
 spaceP :: Parser String
 spaceP = repeatP (charP isSpace)
 
@@ -28,6 +29,7 @@ wordP =
 isP :: Char -> Parser Char
 isP c = charP (== c)
 
+-- | Parse quoted string
 quotedP :: Parser String
 quotedP =
     let ssP = repeatP (escapeSP <|> charP (/= '\''))
@@ -43,6 +45,7 @@ semlOneP =
         betweenPP = betweenP (isP '(' <* spaceP) (spaceP *> isP ')')
      in betweenPP tagP' <|> betweenPP elemsP'
 
+-- | Seml Parser
 semlP :: Parser [Seml]
 semlP = repeatP $ spaceP *> semlOneP <* spaceP
 

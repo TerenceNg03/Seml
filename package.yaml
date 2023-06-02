@@ -1,8 +1,8 @@
 name:                Seml
 version:             0.1.0.0
-github:              "githubuser/Seml"
-license:             BSD3
-author:              "Author name here"
+github:              "TerenceNg03/Seml"
+license:             GPLv3
+author:              "Terence Ng"
 maintainer:          "example@example.com"
 copyright:           "2023 Author name here"
 

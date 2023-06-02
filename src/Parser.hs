@@ -5,6 +5,7 @@ module Parser (Parser (Parser), runParser, (<|>), repeatP, betweenP, sepByP) whe
 import Control.Applicative (Applicative (liftA2))
 import Control.Monad (ap)
 
+-- | A very simple parser combinator
 newtype Parser a = Parser {runParser :: String -> (String, Either String a)}
 
 instance Functor Parser where
@@ -24,6 +25,7 @@ instance Monad Parser where
                 Left err -> (s, Left err)
                 Right val -> runParser (f val) s'
 
+-- | Combine parser with an alternative one
 (<|>) :: Parser a -> Parser a -> Parser a
 p1 <|> p2 = Parser $ \s ->
     case runParser p1 s of
@@ -46,9 +48,10 @@ terminateP = Parser $ \s ->
 repeatP :: Parser a -> Parser [a]
 repeatP = manyP
 
+-- | Parse something between other things
 betweenP :: Parser l -> Parser r -> Parser mid -> Parser mid
 betweenP l r m = l *> m <* r
 
--- | Combine parser with separator
+-- | Repeat parser with separator
 sepByP :: Parser s -> Parser a -> Parser [a]
 sepByP ps pa = liftA2 (:) pa (repeatP (ps *> pa))
